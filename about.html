@@ -2,32 +2,56 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Giới Thiệu - Dự Án AI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS đồng bộ vs index  */
-        body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
-        header{background:#fff;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,.1)}
-        .logo{color:#3b82f6;font-weight:700;font-size:1.4rem;display:flex;gap:10px}
-        nav a{text-decoration:none;color:#666;margin-left:20px;transition:0.3s} nav a:hover,nav a.active{color:#3b82f6;font-weight:700}
+        /* --- ĐỒNG BỘ CSS VỚI INDEX.HTML --- */
+        body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333; overflow-x: hidden;}
         
-        main{flex:1;display:flex;flex-direction:column;align-items:center;padding:30px 15px}
-        .card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:700px;box-shadow:0 8px 20px rgba(0,0,0,.08);line-height:1.6}
+        header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05); position: relative; z-index: 10;}
         
-        h1{color:#3b82f6;margin:0 0 10px;text-align:center;font-size:1.8rem}
-        .subtitle{text-align:center;color:#666;margin-bottom:30px;font-style:italic}
+        .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+        .img-logo { height: 30px; width: auto; }
+
+        nav a{text-decoration:none;color:#666;margin-left:15px;font-size:0.95rem}
+        nav a.active{color:#3b82f6;font-weight:700}
+        nav a:hover{color:#3b82f6}
+
+        main{flex:1;padding:20px 10px;display:flex;justify-content:center; overflow: hidden;}
         
-        h2{color:#2c3e50;border-bottom:2px solid #eee;padding-bottom:10px;margin-top:30px;font-size:1.3rem} h2:first-of-type{margin-top:0}
-        ul, ol{padding-left:20px} li{margin-bottom:10px}
+        /* Card UI với hiệu ứng Zoom */
+        .card{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:600px;box-shadow:0 4px 15px rgba(0,0,0,.05); transition: transform 0.2s ease-out; transform-origin: top center;}
         
-        footer{font-size:.9rem;color:#888;text-align:center;padding:20px;background:#fff;margin-top:auto}
+        h1{color:#3b82f6;margin:0 0 15px;font-size:1.5rem;text-align:center}
+        
+        footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff; position: relative; z-index: 10;}
+
+        /* Nội dung Text riêng của About */
+        h2 { font-size: 1.1rem; color: #2c3e50; border-bottom: 2px solid #f0f4f8; padding-bottom: 8px; margin-top: 20px; margin-bottom: 10px; }
+        p { font-size: 0.95rem; line-height: 1.6; color: #555; margin-bottom: 15px; text-align: justify; }
+        ul { padding-left: 20px; margin-bottom: 15px; }
+        li { font-size: 0.95rem; color: #555; margin-bottom: 8px; }
+        strong { color: #333; }
+
+        /* Style cho phần QR Code */
+        .qr-section { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 2px dashed #f0f4f8; }
+        .qr-img { width: 120px; height: 120px; padding: 5px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 5px; }
+        .qr-note { font-size: 0.8rem; color: #888; font-style: italic; text-align: center; margin-bottom: 0; }
+
+        /* Nút Zoom (Floating Action Buttons) */
+        .zoom-ctrl { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+        .z-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #fff; color: #3b82f6; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; transition: 0.2s; font-weight: bold; }
+        .z-btn:hover { background: #3b82f6; color: #fff; }
+        .z-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo"><i class="fa-solid fa-person-rays"></i> Pose Classifier</div>
+        <div class="logo">
+            <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
+            Pose AI
+        </div>
         <nav>
             <a href="index.html">Trang Chủ</a>
             <a href="about.html" class="active">Giới Thiệu</a>
@@ -35,30 +59,58 @@
     </header>
 
     <main>
-        <div class="card">
+        <div class="card" id="mainCard">
             <h1>Về Dự Án</h1>
 
             <h2>Tổng quan</h2>
-            <p>Dự án được xây dựng nhằm hỗ trợ học sinh điều chỉnh tư thế ngồi học, giúp phòng tránh các bệnh học đường như cong vẹo cột sống và cận thị.</p>
-
-            <h2>Hướng dẫn sử dụng</h2>
-            <ol>
-                <li><strong>Chuẩn bị:</strong> Đặt điện thoại hoặc laptop lên giá đỡ, cách vị trí ngồi khoảng 0.5m - 1m.</li>
-                <li><strong>Góc máy:</strong> Điều chỉnh camera sao cho nhìn thấy rõ phần đầu, vai và lưng. Góc quay nghiêng sẽ giúp phát hiện cong lưng tốt hơn.</li>
-                <li><strong>Kích hoạt:</strong> Truy cập trang chủ, nhấn nút <strong>"Mở camera"</strong>.</li>
-                <li><strong>Học tập:</strong> Ngồi học bình thường. AI sẽ tự động giám sát và đưa ra cảnh báo nếu tư thế sai.</li>
-            </ol>
+            <p>Dự án được xây dựng nhằm hỗ trợ học sinh điều chỉnh tư thế ngồi học, giúp phòng tránh các bệnh học đường như cong vẹo cột sống và cận thị thông qua camera giám sát thời gian thực.</p>
 
             <h2>Công nghệ sử dụng</h2>
             <ul>
-                <li><strong>Nền tảng:</strong> Teachable Machine của Google.</li>
+                <li><strong>Nền tảng:</strong> Teachable Machine (Google).</li>
                 <li><strong>Mô hình:</strong> Pose Project (Nhận diện khung xương).</li>
-                <li><strong>Thư viện:</strong> TensorFlow.js để chạy trực tiếp trên web.</li>
+                <li><strong>Thư viện:</strong> TensorFlow.js (Chạy trực tiếp trên trình duyệt).</li>
             </ul>
+
+            <div class="qr-section">
+                <h2>Truy cập trên thiết bị khác</h2>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://lehung14122610-prog.github.io/aikiemtratuthe/" alt="QR Code" class="qr-img">
+                <p class="qr-note">Quét để mở ứng dụng trên điện thoại</p>
+            </div>
         </div>
     </main>
 
-    <footer>&copy; 2025 Dự án AI Giám Sát Tư Thế. Thực hiện bởi Lê Hưng và Lê Dũng.</footer>
+    <div class="zoom-ctrl">
+        <button class="z-btn" onclick="setZoom(0.1)">+</button>
+        <button class="z-btn" onclick="setZoom(-0.1)">-</button>
+        <button class="z-btn" onclick="resetZoom()" style="font-size:0.8rem">Reset</button>
+    </div>
+
+    <footer>© 2025 Dự án AI Giám Sát Tư Thế. Thực hiện bởi Lê Hưng và Lê Dũng.</footer>
+
+    <script>
+        // --- ZOOM LOGIC (Đã đồng bộ) ---
+        let currZ = 1;
+        function setZoom(val) {
+            currZ += val;
+            if (currZ < 0.5) currZ = 0.5; 
+            if (currZ > 2.0) currZ = 2.0; 
+            updateZoom();
+        }
+        function resetZoom() {
+            currZ = 1;
+            updateZoom();
+        }
+        function updateZoom() {
+            const c = document.getElementById("mainCard");
+            c.style.transform = `scale(${currZ})`;
+            if(currZ > 1) {
+                c.style.marginBottom = (currZ * 50) + "px";
+            } else {
+                c.style.marginBottom = "0px";
+            }
+        }
+    </script>
 
 </body>
 </html>
