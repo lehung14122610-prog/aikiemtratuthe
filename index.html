@@ -7,40 +7,58 @@
     <style>
         body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
         header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05)}
-        
         .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
-        .img-logo { height: 30px; width: auto; }
-
+        .img-logo{height:30px;width:auto}
         nav a{text-decoration:none;color:#666;margin-left:15px;font-size:0.95rem}
         nav a.active{color:#3b82f6;font-weight:700}
-        
         main{flex:1;padding:20px 10px;display:flex;justify-content:center}
         .card{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:0 4px 15px rgba(0,0,0,.05);text-align:center}
-        
         h1{color:#3b82f6;margin:0 0 15px;font-size:1.5rem}
         .view-box{width:100%;aspect-ratio:1/1;background:#000;border-radius:10px;margin-bottom:20px;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
         canvas{width:100%;height:100%;object-fit:cover;display:none}
+        #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
+        .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
+        .img-loading{width:40px;height:40px}
         
-        #hold{color:#888; display:flex; flex-direction:column; align-items:center;} 
-        .img-placeholder { width: 64px; height: 64px; margin-bottom: 10px; opacity: 0.5; }
-        .img-loading { width: 40px; height: 40px; }
+        /* --- SỬA CSS PHẦN NÚT Ở ĐÂY --- */
+        .btns{
+            display:flex;
+            gap:6px; /* Giảm khoảng cách giữa các nút */
+            justify-content:center; /* Căn giữa */
+            flex-wrap:nowrap; /* KHÔNG xuống dòng */
+            margin-bottom:15px;
+            overflow-x: auto; /* Cho phép trượt ngang nếu màn hình quá bé */
+            padding-bottom: 2px; /* Tránh bị cắt bóng đổ nút */
+            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+        }
+        
+        /* Ẩn thanh cuộn nhưng vẫn cuộn được (thẩm mỹ) */
+        .btns::-webkit-scrollbar { display: none; } 
+        .btns { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:15px}
-        
-        button{padding:10px 15px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.9rem}
-        .btn-icon { width: 16px; height: 16px; filter: brightness(0) invert(1); }
-        
+        button{
+            padding:10px 12px; /* Giảm lề ngang chút cho gọn */
+            border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;
+            display:flex;align-items:center;justify-content: center; gap:6px;
+            font-size:0.85rem; /* Chữ nhỏ lại xíu cho vừa dòng */
+            transition:0.2s;
+            white-space: nowrap; /* Chữ không bị ngắt dòng */
+            flex-shrink: 0; /* Không cho nút bị co lại quá mức */
+        }
+        /* ------------------------------ */
+
+        .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
         .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
         .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
         footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff}
-        #load{display:none;position:absolute;}
+        #load{display:none;position:absolute}
     </style>
 </head>
 <body>
     <header>
         <div class="logo">
             <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
-            Pose Classifier AI
+            Pose AI
         </div>
         <nav><a href="index.html" class="active">Trang Chủ</a><a href="about.html">Giới Thiệu</a></nav>
     </header>
@@ -66,15 +84,20 @@
                 </button>
                 
                 <button id="bs" class="gy" onclick="init()">
-                    <img src="icon/icon-video.png" class="btn-icon"> Mở camera
+                    <img src="icon/icon-video.png" class="btn-icon"> Mở cam
                 </button>
                 
                 <button id="bp" class="r" style="display:none" onclick="stop()">
-                    <img src="icon/icon-stop.png" class="btn-icon"> Dừng camera
+                    <img src="icon/icon-stop.png" class="btn-icon"> Dừng
+                </button>
+
+                <button id="btnSnd" class="g" onclick="toggleSound()">
+                    <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
+                    <span id="txtSnd">Bật tiếng</span>
                 </button>
                 
                 <button id="bw" class="o" style="display:none" onclick="swCam()">
-                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi camera
+                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
                 </button>
             </div>
             
@@ -88,7 +111,31 @@
     
     <script>
         const U = "./my_model/", $ = id => document.getElementById(id);
+        const WRONG_LABEL = "Tư thế sai";
+        const audFalse = new Audio('audio/false.mp3');
+        let wrongStartTime = 0; 
+        const ALERT_DELAY = 4000; 
+        let isSoundOn = true; 
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
+
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            const btn = $("btnSnd");
+            const txt = $("txtSnd");
+            const img = $("imgSnd");
+            
+            if (isSoundOn) {
+                btn.className = "g";
+                txt.innerText = "Bật tiếng";
+                img.src = "icon/icon-sound-on.png";
+            } else {
+                btn.className = "gy";
+                txt.innerText = "Tắt tiếng";
+                img.src = "icon/icon-sound-off.png";
+                audFalse.pause();
+                audFalse.currentTime = 0;
+            }
+        }
 
         async function load() {
             if (m) return true;
@@ -111,6 +158,7 @@
                 isRun = true;
                 setCvs(500, 500);
                 ui(true);
+                wrongStartTime = 0;
                 requestAnimationFrame(loop);
             } catch {}
         }
@@ -124,7 +172,7 @@
                 tmPose.drawKeypoints(pose.keypoints, 0.5, ctx);
                 tmPose.drawSkeleton(pose.keypoints, 0.5, ctx);
             }
-            if (Date.now() - lastT > 1000) {
+            if (Date.now() - lastT > 500) { 
                 await predictResult(posenetOutput); 
                 lastT = Date.now();
             }
@@ -133,11 +181,28 @@
 
         async function predictResult(posenetOutput) {
             const p = await m.predict(posenetOutput);
-            let html = "";
+            let bestClass = "", maxProb = 0, html = "";
+            
             for (let i = 0; i < max; i++) {
-                html += `<div class="res"><span>${p[i].className}</span><b>${(p[i].probability*100).toFixed(0)}%</b></div>`;
+                let prob = p[i].probability;
+                let className = p[i].className;
+                if (prob > maxProb) { maxProb = prob; bestClass = className; }
+                html += `<div class="res"><span>${className}</span><b>${(prob*100).toFixed(0)}%</b></div>`;
             }
             $("lbl").innerHTML = html;
+
+            if (bestClass === WRONG_LABEL && maxProb > 0.85) { 
+                if (wrongStartTime === 0) {
+                    wrongStartTime = Date.now();
+                } else if (Date.now() - wrongStartTime > ALERT_DELAY) {
+                    if (isSoundOn) {
+                        audFalse.play().catch(e => {});
+                    }
+                    wrongStartTime = 0; 
+                }
+            } else {
+                wrongStartTime = 0; 
+            }
         }
 
         async function hImg(inp) {
@@ -171,6 +236,7 @@
         async function stop() {
             if (wc && isRun) { wc.stop(); isRun = false; }
             ui(false); $("cv").style.display = "none"; $("hold").style.display = "flex"; $("lbl").innerHTML = "";
+            wrongStartTime = 0; 
         }
 
         async function swCam() {
