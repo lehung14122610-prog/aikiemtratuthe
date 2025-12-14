@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Pose Classifier AI</title>
     <style>
+        /* Thêm box-sizing để tính toán kích thước không bị vỡ */
+        * { box-sizing: border-box; } 
+
         body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
         header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05)}
         .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
@@ -19,39 +22,52 @@
         #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
         .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
         .img-loading{width:40px;height:40px}
+        
         .btns-container {
             position: relative;
             width: 100%;
-            max-width: 500px;
+            height: 40px; 
             margin-bottom: 15px;
-            height: 40px;
+            display: flex;
+            justify-content: center;
         }
-        .btns{
+        
+        .btns {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
+            display: flex;
+            justify-content: center; 
+            gap: 10px; 
+            transition: opacity 0.2s;
+        }
+
+        button{
+            padding:10px 15px;
+            border:none;
+            border-radius:6px;
+            color:#fff;
+            font-weight:600;
+            cursor:pointer;
             display:flex;
-            gap:6px;
+            align-items:center;
             justify-content:center;
-            flex-wrap:nowrap;
-            overflow-x:auto;
-            padding-bottom:2px;
-            -webkit-overflow-scrolling:touch;
-            -ms-overflow-style:none;
-            scrollbar-width:none
+            gap:6px;
+            font-size:0.9rem;
+            white-space:nowrap;
         }
-        .btns::-webkit-scrollbar{display:none} 
-        button{padding:10px 12px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.85rem;transition:0.2s;white-space:nowrap;flex-shrink:0}
+
         #live-btns {
-            justify-content: space-between;
-            padding: 0 50px;
+            gap: 15px; 
         }
+
         .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
         .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
         .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
         footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff}
         #load{display:none;position:absolute}
+        
         .qr-section { 
             text-align: center; 
             margin-top: 20px; 
@@ -257,6 +273,7 @@
                 ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height);
                 ui(true); 
                 
+                // Khi tải ảnh thì ẩn nút live và hiện nút thường (để có thể tải ảnh khác)
                 $("live-btns").style.display = "none";
                 $("normal-btns").style.display = "flex";
                 
