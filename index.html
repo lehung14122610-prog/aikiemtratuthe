@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Pose Classifier AI</title>
     <style>
-        /* Thêm box-sizing để tính toán kích thước không bị vỡ */
         * { box-sizing: border-box; } 
-
         body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
         header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05)}
         .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
@@ -23,43 +21,36 @@
         .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
         .img-loading{width:40px;height:40px}
         
-        .btns-container {
-            position: relative;
-            width: 100%;
-            height: 40px; 
-            margin-bottom: 15px;
+        /* Container chứa nút: Đơn giản, nằm ngang, căn giữa */
+        .btns {
             display: flex;
+            gap: 8px; /* Khoảng cách giữa các nút */
             justify-content: center;
+            flex-wrap: nowrap; /* Không xuống dòng */
+            overflow-x: auto; /* Trượt ngang nếu màn hình quá nhỏ */
+            width: 100%;
+            margin-bottom: 15px;
+            padding-bottom: 5px; /* Để không bị che bóng đổ */
+            -webkit-overflow-scrolling: touch;
         }
         
-        .btns {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center; 
-            gap: 10px; 
-            transition: opacity 0.2s;
-        }
+        .btns::-webkit-scrollbar { display: none; } /* Ẩn thanh cuộn */
 
         button{
-            padding:10px 15px;
+            padding:10px 12px;
             border:none;
             border-radius:6px;
             color:#fff;
             font-weight:600;
             cursor:pointer;
-            display:flex;
+            display:flex; /* Mặc định là flex, JS sẽ chỉnh thành none khi cần ẩn */
             align-items:center;
             justify-content:center;
             gap:6px;
-            font-size:0.9rem;
+            font-size:0.85rem;
             white-space:nowrap;
-        }
-
-        #live-btns {
-            gap: 15px; 
+            flex-shrink: 0;
+            transition: 0.2s;
         }
 
         .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
@@ -78,26 +69,9 @@
             max-width: 500px;
             width: 100%;
         }
-        .qr-section h2 { 
-            color: #3b82f6; 
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        .qr-img { 
-            width: 120px; 
-            height: 120px; 
-            padding: 5px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            margin-bottom: 5px; 
-        }
-        .qr-note { 
-            font-size: 0.8rem; 
-            color: #888; 
-            font-style: italic; 
-            margin-bottom: 0; 
-        }
+        .qr-section h2 { color: #3b82f6; font-size: 1.1rem; margin: 0 0 10px; }
+        .qr-img { width: 120px; height: 120px; padding: 5px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 5px; }
+        .qr-note { font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -124,32 +98,28 @@
                 </div>
             </div>
             
-            <div class="btns-container">
-                <div id="normal-btns" class="btns">
-                    <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
-                    
-                    <button class="g" onclick="$('up').click()">
-                        <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
-                    </button>
-                    
-                    <button id="bs" class="gy" onclick="init()">
-                        <img src="icon/icon-video.png" class="btn-icon"> Mở cam
-                    </button>
+            <div class="btns">
+                <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
+                <button id="btnUp" class="g" onclick="$('up').click()">
+                    <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
+                </button>
+                
+                <button id="btnStart" class="gy" onclick="init()">
+                    <img src="icon/icon-video.png" class="btn-icon"> Mở cam
+                </button>
 
-                    <button id="btnSnd" class="g" onclick="toggleSound()">
-                        <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
-                        <span id="txtSnd">Bật tiếng</span>
-                    </button>
-                </div>
+                <button id="btnStop" class="r" style="display:none" onclick="stop()">
+                    <img src="icon/icon-stop.png" class="btn-icon"> Dừng
+                </button>
 
-                <div id="live-btns" class="btns" style="display:none;">
-                    <button id="bp" class="r" onclick="stop()">
-                        <img src="icon/icon-stop.png" class="btn-icon"> Dừng
-                    </button>
-                    <button id="bw" class="o" onclick="swCam()">
-                        <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
-                    </button>
-                </div>
+                <button id="btnSwitch" class="o" style="display:none" onclick="swCam()">
+                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
+                </button>
+
+                <button id="btnSnd" class="g" onclick="toggleSound()">
+                    <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
+                    <span id="txtSnd">Bật tiếng</span>
+                </button>
             </div>
             
             <div id="lbl"></div>
@@ -168,7 +138,7 @@
     
     <script>
         const U = "./my_model/", $ = id => document.getElementById(id);
-        const WRONG_LABEL = "Sai"; 
+        const WRONG_LABEL = "Tư thế sai";
         const audFalse = new Audio('audio/false.mp3');
         let wrongStartTime = 0; 
         const ALERT_DELAY = 4000; 
@@ -271,11 +241,13 @@
             img.onload = async () => {
                 setCvs(img.width, img.height);
                 ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height);
-                ui(true); 
                 
-                // Khi tải ảnh thì ẩn nút live và hiện nút thường (để có thể tải ảnh khác)
-                $("live-btns").style.display = "none";
-                $("normal-btns").style.display = "flex";
+                // Khi tải ảnh: Ẩn nút start, hiện nút tải ảnh. Ẩn nút stop/switch
+                // Ở đây ta dùng hàm ui(false) để về trạng thái tĩnh, nhưng chỉnh sửa một chút
+                $("btnUp").style.display = "flex";
+                $("btnStart").style.display = "flex";
+                $("btnStop").style.display = "none";
+                $("btnSwitch").style.display = "none";
                 
                 const { pose, posenetOutput } = await m.estimatePose(img);
                 if(pose) {
@@ -291,9 +263,17 @@
             ctx = c.getContext("2d"); c.style.display = "block"; $("hold").style.display = "none";
         }
 
+        // Hàm điều khiển ẩn hiện nút
         function ui(live) {
-            $("normal-btns").style.display = live ? "none" : "flex";
-            $("live-btns").style.display = live ? "flex" : "none";
+            // Nút "Tải ảnh" và "Mở cam" -> Ẩn khi live, Hiện khi stop
+            $("btnUp").style.display = live ? "none" : "flex";
+            $("btnStart").style.display = live ? "none" : "flex";
+
+            // Nút "Dừng" và "Đổi cam" -> Hiện khi live, Ẩn khi stop
+            $("btnStop").style.display = live ? "flex" : "none";
+            $("btnSwitch").style.display = live ? "flex" : "none";
+
+            // Nút "Tiếng" -> LUÔN HIỆN, KHÔNG ĐỤNG VÀO NÓ
         }
 
         async function stop() {
