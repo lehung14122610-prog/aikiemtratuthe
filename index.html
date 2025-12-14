@@ -11,7 +11,7 @@
         .img-logo{height:30px;width:auto}
         nav a{text-decoration:none;color:#666;margin-left:15px;font-size:0.95rem}
         nav a.active{color:#3b82f6;font-weight:700}
-        main{flex:1;padding:20px 10px;display:flex;justify-content:center}
+        main{flex:1;padding:20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center}
         .card{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:0 4px 15px rgba(0,0,0,.05);text-align:center}
         h1{color:#3b82f6;margin:0 0 15px;font-size:1.5rem}
         .view-box{width:100%;aspect-ratio:1/1;background:#000;border-radius:10px;margin-bottom:20px;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
@@ -19,22 +19,79 @@
         #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
         .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
         .img-loading{width:40px;height:40px}
-        .btns{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;margin-bottom:15px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none}
+        .btns-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+            height: 40px;
+        }
+        .btns{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display:flex;
+            gap:6px;
+            justify-content:center;
+            flex-wrap:nowrap;
+            overflow-x:auto;
+            padding-bottom:2px;
+            -webkit-overflow-scrolling:touch;
+            -ms-overflow-style:none;
+            scrollbar-width:none
+        }
         .btns::-webkit-scrollbar{display:none} 
         button{padding:10px 12px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.85rem;transition:0.2s;white-space:nowrap;flex-shrink:0}
+        #live-btns {
+            justify-content: space-between;
+            padding: 0 50px;
+        }
         .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
         .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
         .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
         footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff}
         #load{display:none;position:absolute}
+        .qr-section { 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow:0 4px 15px rgba(0,0,0,.05);
+            max-width: 500px;
+            width: 100%;
+        }
+        .qr-section h2 { 
+            color: #3b82f6; 
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .qr-img { 
+            width: 120px; 
+            height: 120px; 
+            padding: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 5px; 
+        }
+        .qr-note { 
+            font-size: 0.8rem; 
+            color: #888; 
+            font-style: italic; 
+            margin-bottom: 0; 
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">
-            <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
-            Pose Classifier AI
-        </div>
+        <a href="index.html" style="text-decoration: none;">
+            <div class="logo">
+                <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
+                Pose Classifier AI
+            </div>
+        </a>
         <nav><a href="index.html" class="active">Trang Chủ</a><a href="about.html">Giới Thiệu</a></nav>
     </header>
     <main>
@@ -51,32 +108,41 @@
                 </div>
             </div>
             
-            <div class="btns">
-                <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
-                
-                <button class="g" onclick="$('up').click()">
-                    <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
-                </button>
-                
-                <button id="bs" class="gy" onclick="init()">
-                    <img src="icon/icon-video.png" class="btn-icon"> Mở cam
-                </button>
-                
-                <button id="bp" class="r" style="display:none" onclick="stop()">
-                    <img src="icon/icon-stop.png" class="btn-icon"> Dừng
-                </button>
+            <div class="btns-container">
+                <div id="normal-btns" class="btns">
+                    <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
+                    
+                    <button class="g" onclick="$('up').click()">
+                        <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
+                    </button>
+                    
+                    <button id="bs" class="gy" onclick="init()">
+                        <img src="icon/icon-video.png" class="btn-icon"> Mở cam
+                    </button>
 
-                <button id="btnSnd" class="g" onclick="toggleSound()">
-                    <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
-                    <span id="txtSnd">Bật tiếng</span>
-                </button>
-                
-                <button id="bw" class="o" style="display:none" onclick="swCam()">
-                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
-                </button>
+                    <button id="btnSnd" class="g" onclick="toggleSound()">
+                        <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
+                        <span id="txtSnd">Bật tiếng</span>
+                    </button>
+                </div>
+
+                <div id="live-btns" class="btns" style="display:none;">
+                    <button id="bp" class="r" onclick="stop()">
+                        <img src="icon/icon-stop.png" class="btn-icon"> Dừng
+                    </button>
+                    <button id="bw" class="o" onclick="swCam()">
+                        <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
+                    </button>
+                </div>
             </div>
             
             <div id="lbl"></div>
+        </div>
+
+        <div class="qr-section">
+            <h2>Truy cập trên thiết bị khác</h2>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://lehung14122610-prog.github.io/aikiemtratuthe/" alt="QR Code" class="qr-img">
+            <p class="qr-note">Quét để mở ứng dụng trên điện thoại</p>
         </div>
     </main>
     <footer>© 2025 Dự án AI Giám Sát Tư Thế. Thực hiện bởi Lê Hưng và Lê Dũng.</footer>
@@ -86,11 +152,11 @@
     
     <script>
         const U = "./my_model/", $ = id => document.getElementById(id);
-        const WRONG_LABEL = "Tư thế sai";
+        const WRONG_LABEL = "Sai"; 
         const audFalse = new Audio('audio/false.mp3');
         let wrongStartTime = 0; 
         const ALERT_DELAY = 4000; 
-        const MIN_WRONG_PROB = 0.7; 
+        const MIN_WRONG_PROB = 0.7;
         let isSoundOn = true; 
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
 
@@ -167,7 +233,6 @@
             }
             $("lbl").innerHTML = html;
 
-            // ĐIỀU CHỈNH LOGIC NHẬN DIỆN TẠI ĐÂY: maxProb > MIN_WRONG_PROB (0.7)
             if (bestClass === WRONG_LABEL && maxProb > MIN_WRONG_PROB) { 
                 if (wrongStartTime === 0) {
                     wrongStartTime = Date.now();
@@ -190,7 +255,11 @@
             img.onload = async () => {
                 setCvs(img.width, img.height);
                 ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height);
-                ui(true); $("bp").style.display = $("bw").style.display = "none";
+                ui(true); 
+                
+                $("live-btns").style.display = "none";
+                $("normal-btns").style.display = "flex";
+                
                 const { pose, posenetOutput } = await m.estimatePose(img);
                 if(pose) {
                     tmPose.drawKeypoints(pose.keypoints, 0.5, ctx);
@@ -206,13 +275,16 @@
         }
 
         function ui(live) {
-            $("bs").style.display = live ? "none" : "flex";
-            $("bp").style.display = $("bw").style.display = live ? "flex" : "none";
+            $("normal-btns").style.display = live ? "none" : "flex";
+            $("live-btns").style.display = live ? "flex" : "none";
         }
 
         async function stop() {
             if (wc && isRun) { wc.stop(); isRun = false; }
-            ui(false); $("cv").style.display = "none"; $("hold").style.display = "flex"; $("lbl").innerHTML = "";
+            ui(false); 
+            $("cv").style.display = "none"; 
+            $("hold").style.display = "flex"; 
+            $("lbl").innerHTML = "";
             wrongStartTime = 0; 
         }
 
