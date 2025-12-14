@@ -19,34 +19,9 @@
         #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
         .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
         .img-loading{width:40px;height:40px}
-        
-        /* --- SỬA CSS PHẦN NÚT Ở ĐÂY --- */
-        .btns{
-            display:flex;
-            gap:6px; /* Giảm khoảng cách giữa các nút */
-            justify-content:center; /* Căn giữa */
-            flex-wrap:nowrap; /* KHÔNG xuống dòng */
-            margin-bottom:15px;
-            overflow-x: auto; /* Cho phép trượt ngang nếu màn hình quá bé */
-            padding-bottom: 2px; /* Tránh bị cắt bóng đổ nút */
-            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
-        }
-        
-        /* Ẩn thanh cuộn nhưng vẫn cuộn được (thẩm mỹ) */
-        .btns::-webkit-scrollbar { display: none; } 
-        .btns { -ms-overflow-style: none; scrollbar-width: none; }
-
-        button{
-            padding:10px 12px; /* Giảm lề ngang chút cho gọn */
-            border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;
-            display:flex;align-items:center;justify-content: center; gap:6px;
-            font-size:0.85rem; /* Chữ nhỏ lại xíu cho vừa dòng */
-            transition:0.2s;
-            white-space: nowrap; /* Chữ không bị ngắt dòng */
-            flex-shrink: 0; /* Không cho nút bị co lại quá mức */
-        }
-        /* ------------------------------ */
-
+        .btns{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;margin-bottom:15px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none}
+        .btns::-webkit-scrollbar{display:none} 
+        button{padding:10px 12px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.85rem;transition:0.2s;white-space:nowrap;flex-shrink:0}
         .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
         .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
         .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
@@ -115,6 +90,7 @@
         const audFalse = new Audio('audio/false.mp3');
         let wrongStartTime = 0; 
         const ALERT_DELAY = 4000; 
+        const MIN_WRONG_PROB = 0.7; // Mức tin cậy tối thiểu là 70%
         let isSoundOn = true; 
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
 
@@ -191,7 +167,8 @@
             }
             $("lbl").innerHTML = html;
 
-            if (bestClass === WRONG_LABEL && maxProb > 0.85) { 
+            // ĐIỀU CHỈNH LOGIC NHẬN DIỆN TẠI ĐÂY: maxProb > MIN_WRONG_PROB (0.7)
+            if (bestClass === WRONG_LABEL && maxProb > MIN_WRONG_PROB) { 
                 if (wrongStartTime === 0) {
                     wrongStartTime = Date.now();
                 } else if (Date.now() - wrongStartTime > ALERT_DELAY) {
