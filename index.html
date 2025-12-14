@@ -33,7 +33,7 @@
     <header>
         <div class="logo">
             <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
-            Pose AI
+            Pose Classifier AI
         </div>
         <nav><a href="index.html" class="active">Trang Chủ</a><a href="about.html">Giới Thiệu</a></nav>
     </header>
@@ -90,7 +90,7 @@
         const audFalse = new Audio('audio/false.mp3');
         let wrongStartTime = 0; 
         const ALERT_DELAY = 4000; 
-        const MIN_WRONG_PROB = 0.7; // Mức tin cậy tối thiểu là 70%
+        const MIN_WRONG_PROB = 0.7; 
         let isSoundOn = true; 
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
 
