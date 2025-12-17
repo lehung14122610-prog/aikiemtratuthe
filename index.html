@@ -5,201 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Pose Classifier AI</title>
     <style>
-        /* --- CÀI ĐẶT CHUNG --- */
-        * { box-sizing: border-box; } /* Tính cả đường viền và padding vào kích thước phần tử */
-        
-        body {
-            font-family: 'Segoe UI', sans-serif; /* Phông chữ hiện đại, dễ đọc */
-            background: #f0f4f8; /* Màu nền xám xanh nhạt dịu mắt */
-            margin: 0;
-            display: flex;
-            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
-            min-height: 100vh; /* Chiều cao tối thiểu bằng 100% màn hình */
-            color: #333; /* Màu chữ đen xám */
-        }
-
-        /* --- THANH ĐIỀU HƯỚNG (HEADER) --- */
-        header {
-            background: #fff; /* Nền trắng */
-            padding: 15px;
-            display: flex;
-            justify-content: space-between; /* Đẩy logo sang trái, menu sang phải */
-            align-items: center; /* Căn giữa theo chiều dọc */
-            box-shadow: 0 2px 5px rgba(0,0,0,.05); /* Đổ bóng nhẹ phía dưới */
-        }
-
-        .logo {
-            color: #3b82f6; /* Màu xanh dương chủ đạo */
-            font-weight: 700; /* Chữ đậm */
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Khoảng cách giữa logo và chữ */
-        }
-        
-        .img-logo { height: 30px; width: auto; }
-
-        nav a {
-            text-decoration: none; /* Bỏ gạch chân liên kết */
-            color: #666;
-            margin-left: 15px;
-            font-size: 0.95rem;
-        }
-        
-        nav a.active {
-            color: #3b82f6; /* Màu xanh cho mục đang chọn */
-            font-weight: 700;
-        }
-
-        /* --- PHẦN NỘI DUNG CHÍNH (MAIN) --- */
-        main {
-            flex: 1; /* Chiếm toàn bộ khoảng trống còn lại */
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Căn giữa nội dung */
-            justify-content: center;
-        }
-
-        /* Thẻ chứa giao diện chính */
-        .card {
-            background: #fff;
-            border-radius: 12px; /* Bo tròn góc */
-            padding: 20px;
-            width: 100%;
-            max-width: 500px; /* Giới hạn chiều rộng tối đa */
-            box-shadow: 0 4px 15px rgba(0,0,0,.05); /* Hiệu ứng nổi */
-            text-align: center;
-        }
-
-        h1 {
-            color: #3b82f6;
-            margin: 0 0 15px;
-            font-size: 1.5rem;
-        }
-
-        /* khung cam và video */
-        .view-box {
-            width: 100%;
-            aspect-ratio: 1/1; /* tỉ lệ khung hình vuông */
-            background: #000; /* nền đen khi chưa bật cam */
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative; /* căn chỉnh các phần tử con tuyệt đối */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* phần video bị thừa */
-        }
-
-        canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* lấp đầy khung hình ko méo ảnh */
-            display: none;
-        }
-
-        #hold { color: #888; display: flex; flex-direction: column; align-items: center; } 
-        .img-placeholder { width: 64px; height: 64px; margin-bottom: 10px; opacity: 0.5; }
-        .img-loading { width: 40px; height: 40px; }
-        
-        /* nút bấm */
-        .btns {
-            display: flex;
-            gap: 8px; /* khoảng cách giữa các nút */
-            justify-content: center;
-            flex-wrap: nowrap; /* không xuống dòng */
-            overflow-x: auto; /* cho phép cuộn ngang nếu màn hình nhỏ */
-            width: 100%;
-            margin-bottom: 15px;
-            padding-bottom: 5px; 
-            -webkit-overflow-scrolling: touch; /* cuộn mượt trên IPhone */
-        }
-        
-        .btns::-webkit-scrollbar { display: none; } /* ẩn thanh cuộn cho đẹp */
-
-        button {
-            padding: 10px 12px;
-            border: none;
-            border-radius: 6px;
-            color: #fff; /* màu chữ */
-            font-weight: 600;
-            cursor: pointer; /* con trỏ tay khi di chuột vào */
-            display: flex; 
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 0.85rem;
-            white-space: nowrap; /* để chữ trên 1 dòng */
-            flex-shrink: 0;
-            transition: 0.2s; /* hiệu ứng chiều màu 0,2s */
-        }
-
-        .btn-icon { width: 16px; height: 16px; filter: brightness(0) invert(1); } /* chuyển icon sang màu trắng */
-        
-        /* màu nút */
-        .g { background: #10b981; }
-        .gy { background: #6b7280; }
-        .r { background: #ef4444; }
-        .o { background: #f59e0b; }
-
-        /* kết quả dự đoán */
-        .res {
-            background: #f1f5f9;
-            padding: 10px;
-            margin-bottom: 6px;
-            border-radius: 5px;
-            border-left: 4px solid #3b82f6; /* màu viền */
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.95rem;
-        }
-
-        footer {
-            font-size: .8rem;
-            color: #999;
-            text-align: center;
-            padding: 15px;
-            background: #fff;
-        }
-
-        #load { display: none; position: absolute; }
-        
-        /* qr zone */
-        .qr-section { 
-            text-align: center; 
-            margin-top: 20px; 
-            padding: 15px;
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,.05);
-            max-width: 500px;
-            width: 100%;
-        }
-        
-        .qr-section h2 { color: #3b82f6; font-size: 1.1rem; margin: 0 0 10px; }
-        
-        /* kt qr */
-        .qr-img { 
-            width: 180px; 
-            height: 180px; 
-            padding: 5px; 
-            border: 1px solid #ddd; /* màu viền */
-            border-radius: 8px; 
-            margin-bottom: 5px; 
-        }
-        
-        .qr-note { font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 0; }
+        body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
+        header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05)}
+        .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+        .img-logo{height:30px;width:auto}
+        nav a{text-decoration:none;color:#666;margin-left:15px;font-size:0.95rem}
+        nav a.active{color:#3b82f6;font-weight:700}
+        main{flex:1;padding:20px 10px;display:flex;justify-content:center}
+        .card{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:0 4px 15px rgba(0,0,0,.05);text-align:center}
+        h1{color:#3b82f6;margin:0 0 15px;font-size:1.5rem}
+        .view-box{width:100%;aspect-ratio:1/1;background:#000;border-radius:10px;margin-bottom:20px;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        canvas{width:100%;height:100%;object-fit:cover;display:none}
+        #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
+        .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
+        .img-loading{width:40px;height:40px}
+        .btns{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;margin-bottom:15px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none}
+        .btns::-webkit-scrollbar{display:none} 
+        button{padding:10px 12px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.85rem;transition:0.2s;white-space:nowrap;flex-shrink:0}
+        .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
+        .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
+        .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
+        footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff}
+        #load{display:none;position:absolute}
     </style>
 </head>
 <body>
     <header>
-        <a href="index.html" style="text-decoration: none;">
-            <div class="logo">
-                <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
-                Pose Classifier AI
-            </div>
-        </a>
+        <div class="logo">
+            <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
+            Pose Classifier AI
+        </div>
         <nav><a href="index.html" class="active">Trang Chủ</a><a href="about.html">Giới Thiệu</a></nav>
     </header>
     <main>
@@ -218,35 +53,30 @@
             
             <div class="btns">
                 <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
-                <button id="btnUp" class="g" onclick="$('up').click()">
+                
+                <button class="g" onclick="$('up').click()">
                     <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
                 </button>
                 
-                <button id="btnStart" class="gy" onclick="init()">
+                <button id="bs" class="gy" onclick="init()">
                     <img src="icon/icon-video.png" class="btn-icon"> Mở cam
                 </button>
-
-                <button id="btnStop" class="r" style="display:none" onclick="stop()">
+                
+                <button id="bp" class="r" style="display:none" onclick="stop()">
                     <img src="icon/icon-stop.png" class="btn-icon"> Dừng
-                </button>
-
-                <button id="btnSwitch" class="o" style="display:none" onclick="swCam()">
-                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
                 </button>
 
                 <button id="btnSnd" class="g" onclick="toggleSound()">
                     <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
                     <span id="txtSnd">Bật tiếng</span>
                 </button>
+                
+                <button id="bw" class="o" style="display:none" onclick="swCam()">
+                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
+                </button>
             </div>
             
             <div id="lbl"></div>
-        </div>
-
-        <div class="qr-section">
-            <h2>Truy cập trên thiết bị khác</h2>
-            <img src="icon/qr.png" alt="QR Code" class="qr-img">
-            <p class="qr-note">Quét để mở ứng dụng trên điện thoại</p>
         </div>
     </main>
     <footer>© 2025 Dự án AI Giám Sát Tư Thế. Thực hiện bởi Lê Hưng và Lê Dũng.</footer>
@@ -260,7 +90,7 @@
         const audFalse = new Audio('audio/false.mp3');
         let wrongStartTime = 0; 
         const ALERT_DELAY = 4000; 
-        const MIN_WRONG_PROB = 0.7;
+        const MIN_WRONG_PROB = 0.7; 
         let isSoundOn = true; 
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
 
@@ -269,6 +99,7 @@
             const btn = $("btnSnd");
             const txt = $("txtSnd");
             const img = $("imgSnd");
+            
             if (isSoundOn) {
                 btn.className = "g";
                 txt.innerText = "Bật tiếng";
@@ -327,5 +158,69 @@
         async function predictResult(posenetOutput) {
             const p = await m.predict(posenetOutput);
             let bestClass = "", maxProb = 0, html = "";
+            
             for (let i = 0; i < max; i++) {
                 let prob = p[i].probability;
+                let className = p[i].className;
+                if (prob > maxProb) { maxProb = prob; bestClass = className; }
+                html += `<div class="res"><span>${className}</span><b>${(prob*100).toFixed(0)}%</b></div>`;
+            }
+            $("lbl").innerHTML = html;
+
+            // ĐIỀU CHỈNH LOGIC NHẬN DIỆN TẠI ĐÂY: maxProb > MIN_WRONG_PROB (0.7)
+            if (bestClass === WRONG_LABEL && maxProb > MIN_WRONG_PROB) { 
+                if (wrongStartTime === 0) {
+                    wrongStartTime = Date.now();
+                } else if (Date.now() - wrongStartTime > ALERT_DELAY) {
+                    if (isSoundOn) {
+                        audFalse.play().catch(e => {});
+                    }
+                    wrongStartTime = 0; 
+                }
+            } else {
+                wrongStartTime = 0; 
+            }
+        }
+
+        async function hImg(inp) {
+            if (!inp.files[0] || !await load()) return;
+            stop();
+            const img = new Image();
+            img.src = URL.createObjectURL(inp.files[0]);
+            img.onload = async () => {
+                setCvs(img.width, img.height);
+                ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height);
+                ui(true); $("bp").style.display = $("bw").style.display = "none";
+                const { pose, posenetOutput } = await m.estimatePose(img);
+                if(pose) {
+                    tmPose.drawKeypoints(pose.keypoints, 0.5, ctx);
+                    tmPose.drawSkeleton(pose.keypoints, 0.5, ctx);
+                }
+                await predictResult(posenetOutput);
+            }
+        }
+
+        function setCvs(w, h) {
+            const c = $("cv"); c.width = w; c.height = h;
+            ctx = c.getContext("2d"); c.style.display = "block"; $("hold").style.display = "none";
+        }
+
+        function ui(live) {
+            $("bs").style.display = live ? "none" : "flex";
+            $("bp").style.display = $("bw").style.display = live ? "flex" : "none";
+        }
+
+        async function stop() {
+            if (wc && isRun) { wc.stop(); isRun = false; }
+            ui(false); $("cv").style.display = "none"; $("hold").style.display = "flex"; $("lbl").innerHTML = "";
+            wrongStartTime = 0; 
+        }
+
+        async function swCam() {
+            if (!isRun) return;
+            face = face === "user" ? "environment" : "user";
+            await init();
+        }
+    </script>
+</body>
+</html>
