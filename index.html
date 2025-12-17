@@ -5,36 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Pose Classifier AI</title>
     <style>
+        /* Bắt đầu phần CSS (giao diện) */
+        * { box-sizing: border-box; } 
+        /* Tính kích thước phần tử bao gồm cả padding và border */
+        
         body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;margin:0;display:flex;flex-direction:column;min-height:100vh;color:#333}
+        /* Body: Font chữ đẹp, nền xám nhạt, flexbox dọc, chiều cao full màn hình */
+        
         header{background:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.05)}
+        /* Header: Nền trắng, căn chỉnh logo và menu sang 2 bên, có đổ bóng nhẹ */
+        
         .logo{color:#3b82f6;font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+        /* Logo: Màu xanh dương, chữ đậm, căn giữa icon và chữ */
+        
         .img-logo{height:30px;width:auto}
+        /* Kích thước ảnh logo */
+        
         nav a{text-decoration:none;color:#666;margin-left:15px;font-size:0.95rem}
+        /* Link menu: Bỏ gạch chân, màu xám, cách lề trái */
+        
         nav a.active{color:#3b82f6;font-weight:700}
-        main{flex:1;padding:20px 10px;display:flex;justify-content:center}
+        /* Link đang chọn: Màu xanh, chữ đậm */
+        
+        main{flex:1;padding:20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        /* Main: Chiếm phần còn lại màn hình, căn giữa nội dung */
+        
         .card{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:0 4px 15px rgba(0,0,0,.05);text-align:center}
+        /* Card: Khung trắng chứa nội dung chính, bo góc, đổ bóng, giới hạn chiều rộng */
+        
         h1{color:#3b82f6;margin:0 0 15px;font-size:1.5rem}
+        /* Tiêu đề H1: Màu xanh, font lớn */
+        
         .view-box{width:100%;aspect-ratio:1/1;background:#000;border-radius:10px;margin-bottom:20px;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        /* Khung camera: Hình vuông (tỉ lệ 1/1), nền đen, bo góc, ẩn phần thừa */
+        
         canvas{width:100%;height:100%;object-fit:cover;display:none}
+        /* Canvas vẽ hình ảnh từ camera/ảnh upload, mặc định ẩn */
+        
         #hold{color:#888;display:flex;flex-direction:column;align-items:center} 
+        /* Màn hình chờ: Chứa icon camera và chữ "Sẵn sàng" */
+        
         .img-placeholder{width:64px;height:64px;margin-bottom:10px;opacity:0.5}
+        /* Icon camera lúc chờ */
+        
         .img-loading{width:40px;height:40px}
-        .btns{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;margin-bottom:15px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none}
-        .btns::-webkit-scrollbar{display:none} 
-        button{padding:10px 12px;border:none;border-radius:6px;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.85rem;transition:0.2s;white-space:nowrap;flex-shrink:0}
+        /* Icon xoay khi đang tải model */
+        
+        .btns {
+            display: flex; /* Xếp các nút nằm ngang */
+            gap: 8px; /* Khoảng cách giữa các nút */
+            justify-content: center; /* Căn giữa */
+            flex-wrap: nowrap; /* Không xuống dòng */
+            overflow-x: auto; /* Cho phép cuộn ngang nếu quá chật */
+            width: 100%;
+            margin-bottom: 15px;
+            padding-bottom: 5px; 
+            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên di động */
+        }
+        
+        .btns::-webkit-scrollbar { display: none; } 
+        /* Ẩn thanh cuộn ngang cho đẹp */
+
+        button{
+            padding:10px 12px; /* Khoảng cách trong nút */
+            border:none; /* Bỏ viền */
+            border-radius:6px; /* Bo góc nút */
+            color:#fff; /* Chữ trắng */
+            font-weight:600; /* Chữ đậm */
+            cursor:pointer; /* Con trỏ tay khi di chuột */
+            display:flex; 
+            align-items:center;
+            justify-content:center;
+            gap:6px;
+            font-size:0.85rem;
+            white-space:nowrap; /* Không ngắt dòng chữ trong nút */
+            flex-shrink: 0; /* Không bị co lại khi hết chỗ */
+            transition: 0.2s; /* Hiệu ứng chuyển màu mượt */
+        }
+
         .btn-icon{width:16px;height:16px;filter:brightness(0) invert(1)}
-        .g{background:#10b981}.gy{background:#6b7280}.r{background:#ef4444}.o{background:#f59e0b}
+        /* Icon trong nút: Chuyển sang màu trắng */
+        
+        /* Các class màu cho nút */
+        .g{background:#10b981} /* Xanh lá */
+        .gy{background:#6b7280} /* Xám */
+        .r{background:#ef4444} /* Đỏ */
+        .o{background:#f59e0b} /* Cam */
+        
         .res{background:#f1f5f9;padding:10px;margin-bottom:6px;border-radius:5px;border-left:4px solid #3b82f6;display:flex;justify-content:space-between;font-size:0.95rem}
+        /* Kết quả: Hộp màu xám nhạt, có viền xanh bên trái, hiển thị tên và % */
+        
         footer{font-size:.8rem;color:#999;text-align:center;padding:15px;background:#fff}
+        /* Chân trang */
+        
         #load{display:none;position:absolute}
+        /* Màn hình loading (mặc định ẩn) */
+        
+        .qr-section { 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow:0 4px 15px rgba(0,0,0,.05);
+            max-width: 500px;
+            width: 100%;
+        }
+        /* Khung chứa mã QR */
+        
+        .qr-section h2 { color: #3b82f6; font-size: 1.1rem; margin: 0 0 10px; }
+        .qr-img { width: 180px; height: 180px; padding: 5px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 5px; }
+        .qr-note { font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 0; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">
-            <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
-            Pose Classifier AI
-        </div>
+        <a href="index.html" style="text-decoration: none;">
+            <div class="logo">
+                <img src="icon/logo.png" alt="Logo" class="img-logo" onerror="this.style.display='none'"> 
+                Pose Classifier AI </div>
+        </a>
         <nav><a href="index.html" class="active">Trang Chủ</a><a href="about.html">Giới Thiệu</a></nav>
     </header>
     <main>
@@ -45,38 +135,41 @@
                     <img src="icon/camera.png" alt="Camera" class="img-placeholder">
                     <p>Sẵn sàng</p>
                 </div>
-                <canvas id="cv"></canvas>
-                <div id="load">
-                    <img src="icon/loading.gif" alt="Loading..." class="img-loading">
-                </div>
+                <canvas id="cv"></canvas> <div id="load">
+                    <img src="icon/loading.gif" alt="Loading..." class="img-loading"> </div>
             </div>
             
             <div class="btns">
                 <input type="file" id="up" hidden accept="image/*" onchange="hImg(this)">
                 
-                <button class="g" onclick="$('up').click()">
+                <button id="btnUp" class="g" onclick="$('up').click()">
                     <img src="icon/icon-upload.png" class="btn-icon"> Tải ảnh
                 </button>
                 
-                <button id="bs" class="gy" onclick="init()">
+                <button id="btnStart" class="gy" onclick="init()">
                     <img src="icon/icon-video.png" class="btn-icon"> Mở cam
                 </button>
-                
-                <button id="bp" class="r" style="display:none" onclick="stop()">
+
+                <button id="btnStop" class="r" style="display:none" onclick="stop()">
                     <img src="icon/icon-stop.png" class="btn-icon"> Dừng
+                </button>
+
+                <button id="btnSwitch" class="o" style="display:none" onclick="swCam()">
+                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
                 </button>
 
                 <button id="btnSnd" class="g" onclick="toggleSound()">
                     <img id="imgSnd" src="icon/icon-sound-on.png" class="btn-icon"> 
                     <span id="txtSnd">Bật tiếng</span>
                 </button>
-                
-                <button id="bw" class="o" style="display:none" onclick="swCam()">
-                    <img src="icon/icon-switch.png" class="btn-icon"> Đổi cam
-                </button>
             </div>
             
-            <div id="lbl"></div>
+            <div id="lbl"></div> </div>
+
+        <div class="qr-section">
+            <h2>Truy cập trên thiết bị khác</h2>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://lehung14122610-prog.github.io/aikiemtratuthe/" alt="QR Code" class="qr-img">
+            <p class="qr-note">Quét để mở ứng dụng trên điện thoại</p>
         </div>
     </main>
     <footer>© 2025 Dự án AI Giám Sát Tư Thế. Thực hiện bởi Lê Hưng và Lê Dũng.</footer>
@@ -85,141 +178,218 @@
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
     
     <script>
-        const U = "./my_model/", $ = id => document.getElementById(id);
+        // Đường dẫn đến thư mục chứa model (file json và weights)
+        const U = "./my_model/"; 
+        
+        // Hàm viết tắt để lấy element theo ID cho nhanh
+        const $ = id => document.getElementById(id);
+        
+        // Tên của nhãn (label) được coi là tư thế sai trong Model
         const WRONG_LABEL = "Tư thế sai";
+        
+        // Khởi tạo đối tượng âm thanh cảnh báo
         const audFalse = new Audio('audio/false.mp3');
+        
+        // Biến lưu thời điểm bắt đầu sai tư thế (để tính thời gian trễ)
         let wrongStartTime = 0; 
+        
+        // Thời gian trễ trước khi báo động (4000ms = 4 giây)
         const ALERT_DELAY = 4000; 
-        const MIN_WRONG_PROB = 0.7; 
+        
+        // Độ chính xác tối thiểu để coi là sai (0.7 = 70%)
+        const MIN_WRONG_PROB = 0.7;
+        
+        // Trạng thái bật/tắt âm thanh
         let isSoundOn = true; 
+        
+        // Khai báo các biến toàn cục: model, webcam, context 2d, số lượng lớp, trạng thái chạy, camera trước/sau, thời gian cuối
         let m, wc, ctx, max, isRun = false, face = "user", lastT = 0;
 
+        // Hàm bật tắt âm thanh
         function toggleSound() {
-            isSoundOn = !isSoundOn;
-            const btn = $("btnSnd");
-            const txt = $("txtSnd");
-            const img = $("imgSnd");
+            isSoundOn = !isSoundOn; // Đảo ngược trạng thái
+            const btn = $("btnSnd"); // Lấy nút âm thanh
+            const txt = $("txtSnd"); // Lấy chữ trong nút
+            const img = $("imgSnd"); // Lấy ảnh icon
             
             if (isSoundOn) {
+                // Nếu đang bật tiếng thì đổi giao diện thành màu xanh
                 btn.className = "g";
                 txt.innerText = "Bật tiếng";
                 img.src = "icon/icon-sound-on.png";
             } else {
+                // Nếu tắt tiếng thì đổi giao diện thành màu xám
                 btn.className = "gy";
                 txt.innerText = "Tắt tiếng";
                 img.src = "icon/icon-sound-off.png";
-                audFalse.pause();
-                audFalse.currentTime = 0;
+                audFalse.pause(); // Dừng âm thanh ngay lập tức
+                audFalse.currentTime = 0; // Tua về đầu
             }
         }
 
+        // Hàm tải Model AI
         async function load() {
-            if (m) return true;
-            $("load").style.display = "block";
+            if (m) return true; // Nếu model đã tải rồi thì thôi không tải lại
+            $("load").style.display = "block"; // Hiện icon loading
             try {
+                // Tải model và metadata từ đường dẫn U
                 m = await tmPose.load(U + "model.json", U + "metadata.json");
-                max = m.getTotalClasses();
-                $("load").style.display = "none";
-                return true;
-            } catch { $("load").style.display = "none"; return false; }
+                max = m.getTotalClasses(); // Lấy tổng số lớp (class) trong model
+                $("load").style.display = "none"; // Ẩn loading
+                return true; // Báo thành công
+            } catch { 
+                $("load").style.display = "none"; return false; // Báo lỗi nếu tải thất bại
+            }
         }
 
+        // Hàm khởi động Camera
         async function init() {
-            if (!await load()) return;
-            if (wc && isRun) stop();
+            if (!await load()) return; // Tải model trước, nếu lỗi thì dừng
+            if (wc && isRun) stop(); // Nếu đang chạy thì dừng cái cũ trước
             try {
+                // Tạo đối tượng webcam mới (kích thước 500x500)
                 wc = new tmPose.Webcam(500, 500, face === "user");
+                // Cài đặt webcam (camera trước hoặc sau)
                 await wc.setup({ facingMode: face });
+                // Bắt đầu phát video
                 await wc.play();
-                isRun = true;
-                setCvs(500, 500);
-                ui(true);
-                wrongStartTime = 0;
-                requestAnimationFrame(loop);
+                isRun = true; // Đánh dấu là đang chạy
+                setCvs(500, 500); // Thiết lập canvas
+                ui(true); // Cập nhật giao diện sang trạng thái "đang chạy"
+                wrongStartTime = 0; // Reset thời gian sai
+                requestAnimationFrame(loop); // Bắt đầu vòng lặp xử lý
             } catch {}
         }
 
+        // Vòng lặp xử lý hình ảnh liên tục
         async function loop() {
-            if (!isRun) return;
-            wc.update();
+            if (!isRun) return; // Nếu đã dừng thì thoát
+            wc.update(); // Cập nhật frame hình mới nhất từ cam
+            
+            // Ước lượng tư thế (pose) từ hình ảnh webcam
             const { pose, posenetOutput } = await m.estimatePose(wc.canvas);
+            
+            // Vẽ hình ảnh webcam lên canvas
             ctx.drawImage(wc.canvas, 0, 0, $("cv").width, $("cv").height);
+            
+            // Nếu phát hiện được pose (các khớp xương)
             if(pose) {
+                // Vẽ các điểm khớp (mắt, mũi, vai...)
                 tmPose.drawKeypoints(pose.keypoints, 0.5, ctx);
+                // Vẽ bộ khung xương nối các khớp
                 tmPose.drawSkeleton(pose.keypoints, 0.5, ctx);
             }
+            
+            // Kiểm soát tốc độ dự đoán (giới hạn 500ms một lần để đỡ lag)
             if (Date.now() - lastT > 500) { 
-                await predictResult(posenetOutput); 
-                lastT = Date.now();
+                await predictResult(posenetOutput); // Gọi hàm dự đoán
+                lastT = Date.now(); // Cập nhật thời gian lần cuối
             }
-            requestAnimationFrame(loop);
+            requestAnimationFrame(loop); // Lặp lại hàm này ở frame tiếp theo
         }
 
+        // Hàm dự đoán kết quả và xử lý cảnh báo
         async function predictResult(posenetOutput) {
+            // Chạy model để dự đoán tỉ lệ các lớp
             const p = await m.predict(posenetOutput);
             let bestClass = "", maxProb = 0, html = "";
             
+            // Duyệt qua tất cả các lớp (class)
             for (let i = 0; i < max; i++) {
-                let prob = p[i].probability;
-                let className = p[i].className;
+                let prob = p[i].probability; // Lấy tỉ lệ %
+                let className = p[i].className; // Lấy tên lớp
+                // Tìm lớp có tỉ lệ cao nhất
                 if (prob > maxProb) { maxProb = prob; bestClass = className; }
+                // Tạo mã HTML hiển thị kết quả
                 html += `<div class="res"><span>${className}</span><b>${(prob*100).toFixed(0)}%</b></div>`;
             }
-            $("lbl").innerHTML = html;
+            $("lbl").innerHTML = html; // Đưa kết quả ra màn hình
 
-            // ĐIỀU CHỈNH LOGIC NHẬN DIỆN TẠI ĐÂY: maxProb > MIN_WRONG_PROB (0.7)
+            // Logic cảnh báo âm thanh
+            // Nếu lớp cao nhất là "Tư thế sai" VÀ tỉ lệ tin cậy > 70%
             if (bestClass === WRONG_LABEL && maxProb > MIN_WRONG_PROB) { 
                 if (wrongStartTime === 0) {
+                    // Nếu mới bắt đầu sai, ghi lại thời điểm bắt đầu
                     wrongStartTime = Date.now();
                 } else if (Date.now() - wrongStartTime > ALERT_DELAY) {
+                    // Nếu đã sai quá thời gian cho phép (4 giây)
                     if (isSoundOn) {
-                        audFalse.play().catch(e => {});
+                        audFalse.play().catch(e => {}); // Phát âm thanh cảnh báo
                     }
-                    wrongStartTime = 0; 
+                    wrongStartTime = 0; // Reset lại bộ đếm để tránh hú liên tục không ngừng
                 }
             } else {
+                // Nếu tư thế đúng, reset lại thời gian sai về 0
                 wrongStartTime = 0; 
             }
         }
 
+        // Hàm xử lý khi người dùng tải ảnh lên (thay vì dùng cam)
         async function hImg(inp) {
+            // Kiểm tra có file không và tải model
             if (!inp.files[0] || !await load()) return;
-            stop();
+            stop(); // Dừng webcam nếu đang chạy
+            
             const img = new Image();
+            // Tạo URL tạm thời cho ảnh
             img.src = URL.createObjectURL(inp.files[0]);
+            
+            // Khi ảnh tải xong
             img.onload = async () => {
-                setCvs(img.width, img.height);
-                ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height);
-                ui(true); $("bp").style.display = $("bw").style.display = "none";
+                setCvs(img.width, img.height); // Chỉnh canvas theo kích thước ảnh
+                ctx.drawImage(img, 0, 0, $("cv").width, $("cv").height); // Vẽ ảnh
+                
+                // Hiển thị lại nút tải ảnh và mở cam
+                $("btnUp").style.display = "flex";
+                $("btnStart").style.display = "flex";
+                $("btnStop").style.display = "none";
+                $("btnSwitch").style.display = "none";
+                
+                // Chạy nhận diện trên ảnh tĩnh
                 const { pose, posenetOutput } = await m.estimatePose(img);
                 if(pose) {
                     tmPose.drawKeypoints(pose.keypoints, 0.5, ctx);
                     tmPose.drawSkeleton(pose.keypoints, 0.5, ctx);
                 }
-                await predictResult(posenetOutput);
+                await predictResult(posenetOutput); // Dự đoán kết quả
             }
         }
 
+        // Hàm thiết lập Canvas (kích thước và context)
         function setCvs(w, h) {
             const c = $("cv"); c.width = w; c.height = h;
-            ctx = c.getContext("2d"); c.style.display = "block"; $("hold").style.display = "none";
+            ctx = c.getContext("2d"); 
+            c.style.display = "block"; // Hiện canvas
+            $("hold").style.display = "none"; // Ẩn màn hình chờ
         }
 
+        // Hàm điều khiển giao diện (ẩn hiện các nút)
         function ui(live) {
-            $("bs").style.display = live ? "none" : "flex";
-            $("bp").style.display = $("bw").style.display = live ? "flex" : "none";
+            // Nếu đang live (bật cam): Ẩn nút tải ảnh, nút mở cam
+            $("btnUp").style.display = live ? "none" : "flex";
+            $("btnStart").style.display = live ? "none" : "flex";
+
+            // Nếu đang live: Hiện nút dừng, nút đổi cam
+            $("btnStop").style.display = live ? "flex" : "none";
+            $("btnSwitch").style.display = live ? "flex" : "none";
         }
 
+        // Hàm dừng webcam
         async function stop() {
-            if (wc && isRun) { wc.stop(); isRun = false; }
-            ui(false); $("cv").style.display = "none"; $("hold").style.display = "flex"; $("lbl").innerHTML = "";
-            wrongStartTime = 0; 
+            if (wc && isRun) { wc.stop(); isRun = false; } // Gọi lệnh dừng của thư viện
+            ui(false); // Cập nhật giao diện về trạng thái chờ
+            $("cv").style.display = "none"; // Ẩn canvas
+            $("hold").style.display = "flex"; // Hiện màn hình chờ
+            $("lbl").innerHTML = ""; // Xóa kết quả
+            wrongStartTime = 0; // Reset bộ đếm
         }
 
+        // Hàm đổi camera (trước/sau)
         async function swCam() {
-            if (!isRun) return;
+            if (!isRun) return; // Chỉ đổi được khi đang chạy
+            // Đảo ngược chế độ: user (trước) <-> environment (sau)
             face = face === "user" ? "environment" : "user";
-            await init();
+            await init(); // Khởi động lại camera với chế độ mới
         }
     </script>
 </body>
